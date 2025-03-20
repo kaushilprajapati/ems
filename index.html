@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EMS Dashboard</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1f2937;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #3b82f6;
+            border-radius: 4px;
+        }
+        /* Smooth Transitions */
+        .transition-transform {
+            transition: transform 0.3s ease-in-out, opacity 0.3s ease-in-out;
+        }
+        /* Tooltip */
+        .tooltip {
+            position: relative;
+        }
+        .tooltip:hover::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1f2937;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            white-space: nowrap;
+            z-index: 10;
+        }
+        /* Neumorphic Button Style */
+        .neumorphic {
+            background: linear-gradient(145deg, #2d3748, #1f2937);
+            box-shadow: 5px 5px 10px #1a202c, -5px -5px 10px #374151;
+            border: none;
+        }
+        .neumorphic:hover {
+            box-shadow: inset 5px 5px 10px #1a202c, inset -5px -5px 10px #374151;
+        }
+        /* Glassmorphism for Overlay */
+        .glass {
+            background: rgba(31, 41, 55, 0.8);
+            backdrop-filter: blur(10px);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 font-sans antialiased overflow-hidden">
+    <!-- Container -->
+    <div class="flex h-screen">
+        
+        <!-- Sidebar -->
+        <aside id="sidebar" class="fixed inset-y-0 left-0 bg-gray-800 w-64 h-full flex-shrink-0 transition-transform transform -translate-x-full z-20 shadow-xl">
+            <div class="flex items-center justify-between p-4 bg-gradient-to-r from-gray-800 to-blue-900">
+                <h2 class="text-xl font-bold text-blue-400">EMS</h2>
+                <button id="sidebar-toggle" class="text-gray-300 hover:text-blue-400">
+                    <i class="fas fa-times text-lg"></i>
+                </button>
+            </div>
+            <nav class="mt-6 flex-1">
+                <ul>
+                    <li>
+                        <a href="#" class="flex items-center p-4 text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition-colors tooltip" data-tooltip="Overview">
+                            <i class="fas fa-tachometer-alt w-6"></i>
+                            <span class="ml-3">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center p-4 text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition-colors tooltip" data-tooltip="Employee Records">
+                            <i class="fas fa-users w-6"></i>
+                            <span class="ml-3">Employees</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center p-4 text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition-colors tooltip" data-tooltip="Time Tracking">
+                            <i class="fas fa-clock w-6"></i>
+                            <span class="ml-3">Attendance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center p-4 text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition-colors tooltip" data-tooltip="Leave Requests">
+                            <i class="fas fa-calendar-alt w-6"></i>
+                            <span class="ml-3">Leave</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center p-4 text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition-colors tooltip" data-tooltip="Salary Management">
+                            <i class="fas fa-money-check-alt w-6"></i>
+                            <span class="ml-3">Payroll</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" class="flex items-center p-4 text-gray-300 hover:bg-gray-700 hover:text-blue-400 transition-colors tooltip" data-tooltip="Performance Metrics">
+                            <i class="fas fa-chart-line w-6"></i>
+                            <span class="ml-3">Performance</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+            <!-- Floating Action Menu -->
+            <div class="p-4 border-t border-gray-700">
+                <div class="space-y-4">
+                    <button class="w-full neumorphic text-blue-400 p-3 rounded-lg hover:text-blue-300 transition flex items-center justify-center transform hover:scale-105">
+                        <i class="fas fa-plus mr-2"></i> Add Employee
+                    </button>
+                    <button class="w-full neumorphic text-gray-300 p-3 rounded-lg hover:text-blue-400 transition flex items-center justify-center transform hover:scale-105">
+                        <i class="fas fa-download mr-2"></i> Export Data
+                    </button>
+                </div>
+                <a href="#" class="flex items-center p-4 mt-4 text-gray-300 hover:text-blue-400 transition-colors tooltip neumorphic rounded-lg" data-tooltip="Logout">
+                    <i class="fas fa-sign-out-alt w-6"></i>
+                    <span class="ml-3">Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Overlay for Sidebar -->
+        <div id="sidebar-overlay" class="fixed inset-0 bg-black opacity-0 pointer-events-none transition-opacity z-10"></div>
+
+        <!-- Main Content -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- Header -->
+            <header class="bg-gray-800 p-4 flex items-center justify-between border-b border-gray-700 shadow-md">
+                <div class="flex items-center space-x-4">
+                    <button id="sidebar-open" class="text-gray-300 hover:text-blue-400">
+                        <i class="fas fa-bars text-3xl"></i>
+                    </button>
+                    <h1 class="text-xl font-semibold text-blue-400 hidden sm:block">Employee Management System</h1>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <div class="relative">
+                        <input type="text" placeholder="Search..." class="bg-gray-700 text-gray-300 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 w-24 sm:w-48 transition-all">
+                        <i class="fas fa-search absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                    </div>
+                    <button class="text-gray-300 hover:text-blue-400 relative tooltip" data-tooltip="Notifications">
+                        <i class="fas fa-bell text-lg"></i>
+                        <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">3</span>
+                    </button>
+                    <button class="text-gray-300 hover:text-blue-400 tooltip" data-tooltip="Toggle Theme">
+                        <i class="fas fa-moon text-lg"></i>
+                    </button>
+                    <img src="https://via.placeholder.com/40" alt="Profile" class="w-10 h-10 rounded-full border-2 border-blue-400">
+                </div>
+            </header>
+
+            <!-- Dashboard Content -->
+            <section class="p-6 flex-1 overflow-y-auto bg-gradient-to-br from-gray-900 to-gray-800">
+                <!-- Metrics Cards -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-blue-500/50 transition transform hover:-translate-y-1 glass">
+                        <div class="flex items-center">
+                            <i class="fas fa-users text-blue-400 text-2xl mr-3"></i>
+                            <div>
+                                <h3 class="text-gray-400">Total Employees</h3>
+                                <p class="text-2xl font-bold text-blue-400">120</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-blue-500/50 transition transform hover:-translate-y-1 glass">
+                        <div class="flex items-center">
+                            <i class="fas fa-calendar-alt text-blue-400 text-2xl mr-3"></i>
+                            <div>
+                                <h3 class="text-gray-400">Pending Leaves</h3>
+                                <p class="text-2xl font-bold text-blue-400">8</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-blue-500/50 transition transform hover:-translate-y-1 glass">
+                        <div class="flex items-center">
+                            <i class="fas fa-clock text-blue-400 text-2xl mr-3"></i>
+                            <div>
+                                <h3 class="text-gray-400">Today’s Attendance</h3>
+                                <p class="text-2xl font-bold text-blue-400">115</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 p-4 rounded-lg shadow-lg hover:shadow-blue-500/50 transition transform hover:-translate-y-1 glass">
+                        <div class="flex items-center">
+                            <i class="fas fa-money-bill-wave text-blue-400 text-2xl mr-3"></i>
+                            <div>
+                                <h3 class="text-gray-400">Payroll This Month</h3>
+                                <p class="text-2xl font-bold text-blue-400">₱1.2M</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Employee Management & Reports Grid -->
+                <div class="bg-gray-800 p-6 rounded-lg shadow-lg mb-6 glass">
+                    <h2 class="text-lg font-semibold text-blue-400 mb-4 flex items-center">
+                        <i class="fas fa-users-cog mr-2"></i> Employee Management
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="flex items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition transform hover:scale-105">
+                            <img src="https://via.placeholder.com/50" alt="Employee" class="w-12 h-12 rounded-full mr-3">
+                            <div>
+                                <p class="text-gray-300 font-semibold">John Doe</p>
+                                <p class="text-gray-500 text-sm">Developer</p>
+                                <button class="text-blue-400 text-sm hover:underline">View Profile</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition transform hover:scale-105">
+                            <img src="https://via.placeholder.com/50" alt="Employee" class="w-12 h-12 rounded-full mr-3">
+                            <div>
+                                <p class="text-gray-300 font-semibold">Jane Smith</p>
+                                <p class="text-gray-500 text-sm">Designer</p>
+                                <button class="text-blue-400 text-sm hover:underline">View Profile</button>
+                            </div>
+                        </div>
+                        <div class="flex items-center p-4 bg-gray-700 rounded-lg hover:bg-gray-600 transition transform hover:scale-105">
+                            <img src="https://via.placeholder.com/50" alt="Employee" class="w-12 h-12 rounded-full mr-3">
+                            <div>
+                                <p class="text-gray-300 font-semibold">Mark Lee</p>
+                                <p class="text-gray-500 text-sm">Manager</p>
+                                <button class="text-blue-400 text-sm hover:underline">View Profile</button>
+                            </div>
+                        </div>
+                    </div>
+                    <h2 class="text-lg font-semibold text-blue-400 mt-6 mb-4 flex items-center">
+                        <i class="fas fa-file-alt mr-2"></i> Reports
+                    </h2>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <button class="bg-gray-700 text-gray-300 p-4 rounded-lg hover:bg-gray-600 transition flex items-center justify-between transform hover:scale-105">
+                            <span>Attendance Report</span>
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button class="bg-gray-700 text-gray-300 p-4 rounded-lg hover:bg-gray-600 transition flex items-center justify-between transform hover:scale-105">
+                            <span>Payroll Summary</span>
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                        <button class="bg-gray-700 text-gray-300 p-4 rounded-lg hover:bg-gray-600 transition flex items-center justify-between transform hover:scale-105">
+                            <span>Performance Metrics</span>
+                            <i class="fas fa-arrow-down"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Additional Sections -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg lg:col-span-2 glass">
+                        <h2 class="text-lg font-semibold text-blue-400 mb-4 flex items-center">
+                            <i class="fas fa-history mr-2"></i> Recent Activity
+                        </h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-center justify-between p-2 hover:bg-gray-700 rounded transition">
+                                <div class="flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="User" class="w-10 h-10 rounded-full mr-3">
+                                    <span class="text-gray-300">John Doe clocked in</span>
+                                </div>
+                                <span class="text-gray-500 text-sm">08:00 AM</span>
+                            </li>
+                            <li class="flex items-center justify-between p-2 hover:bg-gray-700 rounded transition">
+                                <div class="flex items-center">
+                                    <img src="https://via.placeholder.com/40" alt="User" class="w-10 h-10 rounded-full mr-3">
+                                    <span class="text-gray-300">Jane Smith applied for leave</span>
+                                </div>
+                                <span class="text-gray-500 text-sm">Yesterday</span>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-800 p-6 rounded-lg shadow-lg glass">
+                        <h2 class="text-lg font-semibold text-blue-400 mb-4 flex items-center">
+                            <i class="fas fa-star mr-2"></i> Employee Spotlight
+                        </h2>
+                        <div class="flex items-center">
+                            <img src="https://via.placeholder.com/60" alt="Employee" class="w-16 h-16 rounded-full mr-4">
+                            <div>
+                                <p class="text-gray-300 font-semibold">Maria Cruz</p>
+                                <p class="text-gray-500 text-sm">Top Performer - Q1 2025</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarOpen = document.getElementById('sidebar-open');
+        const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+        function openSidebar() {
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            sidebarOverlay.classList.remove('opacity-0', 'pointer-events-none');
+            sidebarOverlay.classList.add('opacity-50', 'pointer-events-auto');
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.remove('opacity-50', 'pointer-events-auto');
+            sidebarOverlay.classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        sidebarToggle.addEventListener('click', closeSidebar);
+        sidebarOpen.addEventListener('click', openSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+
+        // Card Animation on Load
+        document.querySelectorAll('.shadow-lg').forEach(card => {
+            card.classList.add('opacity-0', 'translate-y-4');
+            setTimeout(() => {
+                card.classList.remove('opacity-0', 'translate-y-4');
+            }, 100);
+        });
+    </script>
+</body>
+</html>
